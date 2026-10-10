@@ -133,6 +133,13 @@ int main(int argc, char *argv[]){
         if(x >= (bx -2))
             move(y,0);
         ch = getch();
+        if(ch != KEY_F(5) && ch != CTRL_KEYPRESS('s') &&
+           ch != KEY_F(6) && ch != CTRL_KEYPRESS('c') &&
+           ch != KEY_F(3) && ch != CTRL_KEYPRESS('x') &&
+           ch != KEY_F(12) && ch != CTRL_KEYPRESS('v') &&
+           ch != CTRL_KEYPRESS('z') && ch != CTRL_KEYPRESS('y')){
+            set_status("");
+        }
         switch(ch){
             case KEY_MOUSE: 
                 if(getmouse(&event) == OK && Mmode == 1){
@@ -196,6 +203,7 @@ int main(int argc, char *argv[]){
                 else{
                     clip = word_copy(x,y+stline);
                 }
+                set_status("COPIED");
                 break; 
             case KEY_F(12): case CTRL_KEYPRESS('v'):
                 cbreak();
@@ -225,8 +233,9 @@ int main(int argc, char *argv[]){
                 getyx(stdscr,y,x);
                 display(stline);
                 move(y,x);
+                set_status("PASTED");
                 break;
-            case KEY_F(2): case CTRL_KEYPRESS('w'):
+            case KEY_F(2): case CTRL_KEYPRESS('w'): case CTRL_KEYPRESS('q'):
                 endwin();
                 self_destruct();
                 exit(0);
@@ -243,16 +252,17 @@ int main(int argc, char *argv[]){
                     display(stline);
                     move(y,x);
                 }
+                set_status("CUT");
                 refresh();
                 break;   
             case KEY_F(5): case CTRL_KEYPRESS('s'):
-                save(fname);
-                get = getch();
-                if(get == 'q' || get == 'Q'){
-                    endwin();
-                    self_destruct();
-                    exit(0);
+                if(save(fname)){
+                    set_status("SAVED");
                 }
+                else{
+                    set_status("SAVE FAILED");
+                }
+                master_menu();
                 break;
             case '\n':
                 add_event(&states,"next",x,y+stline,"\n","");
@@ -415,9 +425,11 @@ int main(int argc, char *argv[]){
                 break;
             case CTRL_KEYPRESS('y'):
                 retrack(&redo);
+                set_status("REDO");
                 break;    
             case CTRL_KEYPRESS('z'):
                 backtrack(&states);
+                set_status("UNDO");
                 break;
             default:
                 add_event(&states,"add",x,y+stline,"","");

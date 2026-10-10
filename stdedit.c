@@ -399,22 +399,38 @@ int backspace(int y, int x){
     return n_x;
 
 }
-void save(char *fname){
-    int fd = open(fname,O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
-    //int i = 0, fd = open("random.txt", O_WRONLY | O_CREAT ,S_IRUSR | S_IWUSR);
+
+char status_msg[128] = "";
+
+void set_status(const char *msg){
+    if(msg){
+        snprintf(status_msg,sizeof(status_msg),"%s",msg);
+    } else {
+        status_msg[0] = '\0';
+    }
+}
+
+int save(char *fname){
+    if(!fname || fname[0] == '\0')
+        return 0;
+    int fd = open(fname,O_WRONLY | O_TRUNC | O_CREAT, 0644);
+    if(fd < 0)
+        return 0;
     point *temp = data.front;
     while(temp){
-        char *str = (char *)calloc(1,1);
         node *row = temp->element.store;
-        str = realloc(str,strlen(str)+1);
-        while(row->next){
-            write(fd,&row->val,1);
+        while(row && row->next){
+            if(write(fd,&row->val,1) < 0){
+                close(fd);
+                return 0;
+            }
             row = row->next;
         }
         temp = temp->tail;
     }
 
     close(fd);
+    return 1;
 }
 
 
@@ -713,11 +729,15 @@ void master_menu(){
     int y,x;
     getyx(stdscr,y,x);
     WINDOW *menu = create_newwin(3,bx,by-3,0);
-    //wborder(menu, ' ', ' ', ' ',' ',' ',' ',' ',' ');
     wattron(menu,A_REVERSE);
-    mvwprintw(menu,1,1," OPTIONS:F1 | SAVE:F5 | EXIT:F2 | ^X:CUT | ^C:COPY | SUGGESTIONS:TAB | TEXT EDITOR | LINE NO.: %d | COORDINATES:(%d,%d)| #LINE:%d",y+stline+1,x,y,(y+stline)/10);
+    if(status_msg[0] != '\0'){
+        mvwprintw(menu,1,1," [%s]  | SAVE:F5/^S | EXIT:F2/^Q | OPTIONS:F1 | LINE: %d | COL: %d",status_msg,y+stline+1,x);
+    } else {
+        mvwprintw(menu,1,1," OPTIONS:F1 | SAVE:F5/^S | EXIT:F2/^Q | ^X:CUT | ^C:COPY | LINE: %d | COL: %d",y+stline+1,x);
+    }
     wattroff(menu,A_REVERSE);
     wrefresh(menu);
+    destroy_win(menu);
     move(y,x);
     return;
 }
