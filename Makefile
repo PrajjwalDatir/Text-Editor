@@ -1,8 +1,20 @@
-all:
-	cc -c stack.c -o stack
-	cc -c line.c -o line
-	cc -c stdedit.c -o stdedit
-	cc -c editor.c -o editor
-	cc -c events.c -o events
-	cc -c undo.c  -o undo
-	cc stack line stdedit undo events editor -o text_editor -lncurses 
+CC ?= cc
+CFLAGS ?= -Wall -Wextra -O2
+LDFLAGS ?= -lncurses
+
+SRCS = stack.c line.c events.c undo.c stdedit.c editor.c
+OBJS = $(SRCS:.c=.o)
+TARGET = text_editor
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $(TARGET)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJS) $(TARGET) a.out edit stack line events undo stdedit editor *.o
+
+.PHONY: all clean

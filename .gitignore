@@ -1,0 +1,4 @@
+*.o
+text_editor
+a.out
+.DS_Store
