@@ -1,6 +1,6 @@
 #include"line.h"
-#include<malloc.h>
-#include<ncurses.h>
+#include<stdlib.h>
+#include<curses.h>
 #include<stdlib.h>
 #include<stdio.h>
 void initq(line *s){
@@ -28,59 +28,78 @@ void enqueue(line *s){
 
 }
 void enqueue_pos(line *l, int a){
-    point *newnode =  (point *)calloc(1,sizeof(point));
+    point *newnode = (point *)calloc(1,sizeof(point));
     inits(&(newnode->element));
+    if(l->front == NULL){
+        l->front = newnode;
+        l->link = newnode;
+        l->lines++;
+        return;
+    }
     point* temp = l->front;
     int i = 0;
-    for(; i < a; i++)
+    for(; i < a && temp->tail != NULL; i++)
         temp = temp->tail;
-    temp->head->tail = newnode;
+    if(temp->head != NULL){
+        temp->head->tail = newnode;
+        newnode->head = temp->head;
+    } else {
+        l->front = newnode;
+        newnode->head = NULL;
+    }
     newnode->tail = temp;
-    newnode->head = temp->head;
     temp->head = newnode;
     l->lines++;
     return;
-
 }
 void dequeue(line *s){
-    s->link->head->tail = NULL;
+    if(s->link == NULL)
+        return;
     point *temp = s->link;
-    s->link = s->link->head;
+    if(s->link->head != NULL){
+        s->link->head->tail = NULL;
+        s->link = s->link->head;
+    } else {
+        s->link = NULL;
+        s->front = NULL;
+    }
+    if(s->lines > 0)
+        s->lines--;
     free(temp);
     return;
 }
 void dequeueloc(line *s,int x){
+    if(s->front == NULL)
+        return;
     point* temp = s->front;
-    int num;
     int i;
-    for(i = 0; i < x; i++)
+    for(i = 0; i < x && temp->tail != NULL; i++)
         temp = temp->tail;
     
     if(temp->tail == NULL){
         dequeue(s);
         return;
     }
-    temp->head->tail = temp->tail;
-    temp->tail->head = temp->head;
-
-    s->lines--;
+    if(temp->head != NULL){
+        temp->head->tail = temp->tail;
+    } else {
+        s->front = temp->tail;
+    }
+    if(temp->tail != NULL){
+        temp->tail->head = temp->head;
+    }
+    if(s->lines > 0)
+        s->lines--;
     free(temp);
     return;
-
 }
 int isEmptyq(line *s){
-    if(s->link->head == s->link->tail)
+    if(s == NULL || s->link == NULL || s->front == NULL)
         return 1;
-    else
-        return 0;
+    return 0;
 }
-/*int isFull(line *s->link){
-    if(s->link->i ==  SIZE -1)
-        return 1;
-    else
-        return 0;
-}*/
 int ipeepq(line *s){
-
-
+    if(s == NULL) return 0;
+    return s->lines;
 }
+

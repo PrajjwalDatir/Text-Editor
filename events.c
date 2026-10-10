@@ -1,5 +1,5 @@
 #include"events.h"
-#include<malloc.h>
+#include<stdlib.h>
 void inite(undo *s){
     s->e = NULL;
     s->num = 0;

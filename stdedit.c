@@ -9,9 +9,7 @@
 #include<unistd.h>
 #include<fcntl.h>
 #include<errno.h>
-#include<ncurses.h>
 #include<curses.h>
-#include<malloc.h>
 #include<stdio.h>
 #include<stdlib.h>
 
@@ -85,6 +83,7 @@ void display(int stline){
 }
 
 void initialise(int line){
+        (void)line;
         initq(&data);
         inite(&states);
         inite(&redo);
@@ -112,6 +111,8 @@ int add_line(int line){
     ch[0] = ipops(&(temp->element));
 
     getyx(stdscr,y,x);
+    (void)y;
+    (void)x;
     
     while(ch[0] != '\n'){
        
@@ -158,7 +159,7 @@ int search_char(char ch,int param,istack t){
 
 }
 int add_char(char ch,int line,int loc){
-        int i = 0,y,x,j = 0;
+        int i = 0,j = 0;
         point *temp = data.front;
         for(i = 0; i < line; i++){
           temp = temp->tail;
@@ -351,7 +352,8 @@ int backspace(int y, int x){
             str = realloc(str,strlen(str) +2);
 
         }
-        int t = temp->element.width; 
+        int t = temp->element.width;
+        (void)t;
         if(!isEmptys(&(temp->element))){
                 while(ipops(&(temp->element)) != '\n');
             }   
@@ -404,7 +406,6 @@ void save(char *fname){
     while(temp){
         char *str = (char *)calloc(1,1);
         node *row = temp->element.store;
-        char ch[2] = {'\0'};
         str = realloc(str,strlen(str)+1);
         while(row->next){
             write(fd,&row->val,1);
@@ -420,11 +421,10 @@ void save(char *fname){
 int readfile(int fdw){
     char buffer[2];
     int x,y,mk;
-    point *temp = data.front;
+    (void)mk;
     clear();
     move(0,0);
     stline = 0;
-    int count = 0;
     while(read(fdw,buffer,1)){
         getyx(stdscr,y,x);
         if(buffer[0] == '\t' || buffer[0] == '\r')
@@ -480,13 +480,18 @@ int readfile(int fdw){
 }
 
 int read_chunck(){
+    if(fdr < 0)
+        return 0;
     char buffer[2] = {'\0'};
     int x,y,mk;
     point *temp = data.front;
+    (void)y;
+    (void)mk;
+    (void)temp;
     int count = 0;
     int t = ftrack;
     int k = 0;
-    while(k = read(fdr,buffer,1)){
+    while((k = read(fdr,buffer,1)) > 0){
         if(k == 0)  
             return 0;
         if(buffer[0] == '\t' || buffer[0] == '\r')
@@ -543,6 +548,7 @@ char* get_word(FILE *fp){
         i++;
         }
     }
+    return NULL;
 }
 void printopt(WINDOW *win, char** dict,int mark,int count){
     int x,y,i;
@@ -621,10 +627,10 @@ char* dict(int t){
     if(!fp)
         return str;
     int q;
-    while(word = get_word(fp)){ 
+    while((word = get_word(fp)) != NULL){ 
         if(strstr(word,"\n"))
             continue;
-        for(q = 0; q < strlen(str); q++){
+        for(q = 0; q < (int)strlen(str); q++){
             if (str[q] >= 65 && str[q] <= 90){
                 word[q] = word[q] - 32;         
             }
@@ -709,7 +715,7 @@ void master_menu(){
     WINDOW *menu = create_newwin(3,bx,by-3,0);
     //wborder(menu, ' ', ' ', ' ',' ',' ',' ',' ',' ');
     wattron(menu,A_REVERSE);
-    mvwprintw(menu,1,1," OPTIONS:F1 | SAVE:F5 | EXIT:F2 | ^X:CUT | ^C:COPY | SUGGESTIONS:TAB | VASU'S TEXT EDITOR | LINE NO.: %d | COORDINATES:(%d,%d)| #LINE:%d",y+stline+1,x,y,(y+stline)/10);
+    mvwprintw(menu,1,1," OPTIONS:F1 | SAVE:F5 | EXIT:F2 | ^X:CUT | ^C:COPY | SUGGESTIONS:TAB | TEXT EDITOR | LINE NO.: %d | COORDINATES:(%d,%d)| #LINE:%d",y+stline+1,x,y,(y+stline)/10);
     wattroff(menu,A_REVERSE);
     wrefresh(menu);
     move(y,x);
@@ -948,7 +954,8 @@ void find_replace(int ctrl){
         mvwprintw(getwrd,2,1, "ENTER THE WORD YOU WANT TO REPLACE WITH :- \n");
         wrefresh(getwrd);
         wmove(getwrd,4,1);
-        mg2 = 0,mg1;
+        mg2 = 0;
+        (void)mg1;
         while(mg2 != -1){
             mg1 = wgetch(getwrd);
             switch(mg1){
@@ -1004,10 +1011,10 @@ void find_replace(int ctrl){
                                     j--;
                                 }
                             }
-                            for(r = 0; r < strlen(rplmt); r++) {
+                            for(r = 0; r < (int)strlen(rplmt); r++) {
                                 getyx(stdscr,y,x);
                                 int mk = add_char(rplmt[r],i,t);
-                                if( (t >= (bx - 3)) || (getwidth(i) >= (bx-3)) && mk != 0){
+                                if( (t >= (bx - 3)) || ((getwidth(i) >= (bx-3)) && mk != 0)){
                                     t = mk;
                                     j = mk;
                                 }
@@ -1078,7 +1085,7 @@ void goto_line(){
     wmove(lgoto,4,1);
     ch[0] = wgetch(lgoto);
     while((ch[0] != '\n')  &&  (ch[0] != ' ')){
-            if(ch[0] == KEY_BACKSPACE){
+            if((unsigned char)ch[0] == 127 || ch[0] == 8){
                 ch[0] = wgetch(lgoto);
                 continue;
             }
@@ -1138,11 +1145,11 @@ void goto_line(){
     return;
 }
 void self_destruct(){
-    while(!isEmptyq(&data)){
+    while(!isEmptyq(&data) && data.front != NULL){
         while(!isEmptys(&(data.front->element)))
                 ipops(&(data.front->element));
         dequeue(&data);
     }
-    printf("\nThe Program terminated Successfully :)\nThanks For Using Vasu's Text Editor\n\n");
+    printf("\nProgram terminated cleanly.\n\n");
     return;
 }

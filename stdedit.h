@@ -2,7 +2,7 @@
 int add_char(char,int,int);
 int add_line(int);
 void display(int);
-void initialise();
+void initialise(int);
 void save(char *);
 int backspace(int ,int );
 int getwidth(int);

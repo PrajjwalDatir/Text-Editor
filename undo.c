@@ -4,7 +4,6 @@
 #include"line.h"
 #include<string.h>
 #include<curses.h>
-#include<ncurses.h>
 #include<stdlib.h>
 extern int by,bx;
 extern int lines;
@@ -17,9 +16,9 @@ void add_event(undo *s,char *state,int a,int b,char *c, char *d){
     e.state = state;
     e.p1 = a;
     e.p2 = b;
-    e.p3 = (char *)calloc(sizeof(c)+1,1);
+    e.p3 = (char *)calloc(strlen(c)+1,1);
     strcpy(e.p3,c);
-    e.p4 = (char *)calloc(sizeof(d)+1,1);
+    e.p4 = (char *)calloc(strlen(d)+1,1);
     strcpy(e.p4,d);
     epush(s,e);
 }
@@ -63,7 +62,8 @@ void retrack(undo *s){
 }
 void undo_replace(event e){
 
-    int rpt, j, k,i,y,x,t,r;
+    int rpt, j, k,i,y,x,t;
+    size_t r;
         point *temp = data.front;
         node *trace = temp->element.store;
         char *rplmt = e.p3;
@@ -100,7 +100,7 @@ void undo_replace(event e){
                             for(r = 0; r < strlen(rplmt); r++) {
                                 getyx(stdscr,y,x);
                                 int mk = add_char(rplmt[r],i,t);
-                                if( (t >= (bx - 3)) || (getwidth(i) >= (bx-3)) && ( mk != 0)){
+                                if( (t >= (bx - 3)) || ((getwidth(i) >= (bx-3)) && ( mk != 0))){
                                     t = mk;
                                     j = mk;
                                 }

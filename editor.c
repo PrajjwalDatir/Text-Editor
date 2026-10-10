@@ -1,7 +1,4 @@
-//libraries and header files
-#include<ncurses.h>
 #include<curses.h>
-#include<malloc.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -43,7 +40,8 @@ int main(int argc, char *argv[]){
     int mg1,mg2 = 0;
     keypad(stdscr, TRUE);
     int mk,get,u,v;
-    char *copy;
+    (void)v;
+    (void)u;
     lines = 0;
     initialise(lines);
     thresh = by;
@@ -52,7 +50,7 @@ int main(int argc, char *argv[]){
         getmaxyx(stdscr,by,bx);
         move(by/3,bx/2.5);
         wattron(stdscr,A_UNDERLINE);
-        printw("VASU'S TEXT EDITOR");
+        printw("TERMINAL TEXT EDITOR");
         wattroff(stdscr,A_UNDERLINE);
         move(by/2,bx/3);
         printw("No File Name provided :(");
@@ -205,7 +203,7 @@ int main(int argc, char *argv[]){
                     break;
                 getyx(stdscr,y,x);
                 //strcat(clip," ");
-                for(i = 0; i < strlen(clip); i++){ 
+                for(i = 0; i < (int)strlen(clip); i++){ 
                     get = getwidth(y+stline);
                     getyx(stdscr,y,x);
                     mk = add_char(clip[i],y+stline,x);
@@ -283,6 +281,8 @@ int main(int argc, char *argv[]){
                 break;
             
             case KEY_BACKSPACE:
+            case 127:
+            case 8:
                 if(x == 0){
                     if(y == 0){
                         if(stline == 0){

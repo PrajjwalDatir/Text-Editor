@@ -1,5 +1,5 @@
 #include"stack.h"
-#include<malloc.h>
+#include<stdlib.h>
 void inits(istack *s){
     
     s->p = calloc(1,sizeof(node));
@@ -105,9 +105,11 @@ int isEmptys(istack *s){
 
 }
 int isFull(istack *s){
+    (void)s;
     return 0;
 }
 int ipeeps(istack *s){
-    if(!isEmptys(s))
+    if(!isEmptys(s) && s->p != NULL && s->p->prev != NULL)
         return s->p->prev->val;
+    return 0;
 }
