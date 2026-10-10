@@ -37,7 +37,7 @@ if(!mysqli_select_db($connect,'info')){
 <html lang="en" dir="ltr" >
   <head>
     <meta charset="utf-8">
-    <title>VS TECH</title>
+    <title>Support Portal</title>
     <link rel="stylesheet" href="style.css">
 
 

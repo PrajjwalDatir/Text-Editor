@@ -1,46 +1,33 @@
-# Text Editor
+# Terminal Text Editor
 
-A C based text-editor built with Ncurses library.
-  
-Data structures used - list,stack.
+A lightweight C-based terminal text editor built with the Ncurses library.
 
-## Usage
+## Requirements
 
+- **macOS**: Xcode Command Line Tools (`xcode-select --install`)
+- **Linux**: GCC/Clang and Ncurses development libraries (`sudo apt-get install libncurses5-dev libncursesw5-dev` or `sudo dnf install ncurses-devel`)
+- **Windows**: WSL2 (Ubuntu) or MinGW with PDCurses
 
+## Build & Run
 
 ```bash
-make 
-./text_editor
+# Build
+make
+
+# Run
+./text_editor [filename]
+
+# Clean build artifacts
+make clean
 ```
+
 ## Features
-    CREATING FILES
-	SAVING FILES 
-	READING FROM FILES
-	EDITING FILES
-	CUT/COPY WORDS <manual>
-	CUT/COPY LINES <manual>
-	SEARCH WORDS
-	REPLACE WORDS
-	GOTO LINE NO.
-	TYPING SUGGESTIONS ( PRESS TAB)
-	UNDO/REDO  <beta>
-	MOUSE MODE/KEYBOARD MODE
-	NICE UI INTERFACE
-	READ LARGE FILES...USING CHUNKS (TESTED UPTO 15 MB OF TEXT FILE - 80,000 LINES)
-## Screenshots
 
-![How to Run ?](https://github.com/vasusharma7/Text-Editor/blob/master/screenshots/Screenshot%20(479).png)
-
-![Initial Screen](https://github.com/vasusharma7/Text-Editor/blob/master/screenshots/Screenshot%20(480).png)
-
-![All Available Options](https://github.com/vasusharma7/Text-Editor/blob/master/screenshots/Screenshot%20(481).png)
-
-![Suggestions](https://github.com/vasusharma7/Text-Editor/blob/master/screenshots/Screenshot%20(482).png)
-
-![Goto Line Number](https://github.com/vasusharma7/Text-Editor/blob/master/screenshots/Screenshot%20(483).png)
-
-
-
-## Contributing
-Pull requests are welcome. 
-
+- **File Operations**: Create, open, edit, and save files
+- **Editing**: Character and line insertion, deletion, backspace
+- **Clipboard**: Cut and copy words and lines
+- **Search & Navigation**: Word search, word replace, goto line number
+- **Typing Assistance**: Word completion suggestions (`Tab`)
+- **History**: Undo / redo support
+- **Input Modes**: Full keyboard navigation and mouse click support
+- **Large Files**: Chunked file streaming for handling large files
